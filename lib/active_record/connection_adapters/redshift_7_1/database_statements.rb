@@ -113,12 +113,13 @@ module ActiveRecord
 
         # Aborts a transaction.
         def exec_rollback_db_transaction
-          internal_execute(execute 'ROLLBACK', allow_retry: false, materialize_transactions: true)
+          internal_execute('ROLLBACK', allow_retry: false, materialize_transactions: true)
         end
 
         def exec_restart_db_transaction # :nodoc:
           cancel_any_running_query
-          internal_execute("ROLLBACK AND CHAIN", "TRANSACTION", allow_retry: false, materialize_transactions: true)
+          exec_rollback_db_transaction
+          begin_db_transaction
         end
 
         # From https://www.postgresql.org/docs/current/functions-datetime.html#FUNCTIONS-DATETIME-CURRENT
